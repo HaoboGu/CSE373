@@ -524,4 +524,62 @@ public class TestDoubleLinkedList extends BaseTest {
             count += 2;
         }
     }
+
+    @Test(timeout=SECOND)
+    public void testDeleteHappyCase() {
+        IList<Integer> list = this.makeInstance();
+        for (int i = 1; i < 6; i++) {
+            list.add(i);
+        }
+        list.delete(1);
+        this.assertListMatches(new Integer[] {1, 3, 4, 5}, list);
+        assertEquals(4, list.size());
+        list.delete(3);
+        this.assertListMatches(new Integer[] {1, 3, 4}, list);
+        assertEquals(3, list.size());
+        list.delete(0);
+        this.assertListMatches(new Integer[] {3, 4}, list);
+        assertEquals(2, list.size());
+        list.delete(1);
+        this.assertListMatches(new Integer[] {3}, list);
+        assertEquals(1, list.size());
+        list.delete(0);
+        assertEquals(0, list.size());
+    }
+
+    @Test(timeout=SECOND)
+    public void testDeleteEmpty() {
+        IList<Integer> list = this.makeInstance();
+        try {
+            list.delete(0);
+            // If delete function does not throw a correct exception, the test fails with a message
+            fail("Expected an IndexOutOfBoundsException"); 
+        }
+        catch(IndexOutOfBoundsException ex) {
+            // delete throws right exception, so do nothing
+        }
+    }
+
+    @Test(timeout=SECOND)
+    public void testDeleteIndexOutOfRange() {
+        IList<Integer> list = this.makeInstance();
+        list.add(1);
+        try {
+            list.delete(2);
+            // If delete function does not throw a correct exception, the test fails with a message
+            fail("Expected an IndexOutOfBoundsException"); 
+        }
+        catch(IndexOutOfBoundsException ex) {
+            // delete throws right exception, so do nothing
+        }
+        try {
+            list.delete(-1);
+            // If delete function does not throw a correct exception, the test fails with a message
+            fail("Expected an IndexOutOfBoundsException"); 
+        }
+        catch(IndexOutOfBoundsException ex) {
+            // delete throws right exception, so do nothing
+        }
+    }
+
 }
