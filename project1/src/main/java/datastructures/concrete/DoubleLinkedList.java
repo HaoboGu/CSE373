@@ -30,7 +30,7 @@ public class DoubleLinkedList<T> implements IList<T> {
     public void add(T item) {
         if (size == 0) { 
             // if list is empty, directly add the node and set front/back
-            Node<T> node = new Node<T>(item);
+            Node<T> node = new Node<T>(null, item, null);
             front = node;
             back = node;
             size++;	
@@ -135,26 +135,44 @@ public class DoubleLinkedList<T> implements IList<T> {
         if (index < 0 || index >= size + 1) {
             throw new IndexOutOfBoundsException();
         }
-        else if (size == 0) {
+        if (size == 0) {
             // the list is empty
-            Node<T> current = new Node<T>(item);
+            Node<T> current = new Node<T>(null, item, null);
             front = current;
             back = current;
+            size++;
+            return;
         }
-        else if (index == 0) {
+        if (index == 0) {
             // insert to head of the list
             Node<T> current = new Node<T>(null, item, front);
             front.prev = current;
             front = current;
+            size++;
+            return;
+     
         }
-        else if (index == size) {
+        if (index == size) {
             // insert to tail of the list
             Node<T> current = new Node<T>(back, item, null);
             back.next = current;
             back = current;
+            size++;
+            return;
+        }
+        
+        // find the insert position from front to back
+        if (index > 0.5*size) {
+            Node<T> pointer = back;
+            for (int i = 0; i < size - index; i++) {
+                pointer = pointer.prev;
+            }
+            Node<T> current = new Node<T>(pointer, item, pointer.next);
+            pointer.next.prev = current;
+            pointer.next = current;
+            size++;
         }
         else {
-            // find the insert position from front to back
             Node<T> pointer = front;
             for (int i = 0; i < index; i++) {
                 pointer = pointer.next;
@@ -163,8 +181,8 @@ public class DoubleLinkedList<T> implements IList<T> {
             // insert between pointer and pointer.prev
             pointer.prev.next = current;
             pointer.prev = current;
-        }
-        size++;
+            size++; 
+        }    
     }
 
     @Override

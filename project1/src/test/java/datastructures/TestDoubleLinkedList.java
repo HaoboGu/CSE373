@@ -581,5 +581,16 @@ public class TestDoubleLinkedList extends BaseTest {
             // delete throws right exception, so do nothing
         }
     }
+    @Test(timeout=5 * SECOND)
+    public void testAddAndDeleteIsEfficient() {
+        IList<Integer> list = new DoubleLinkedList<>();
+        for (int i = 0; i < 10000; i++) {
+            list.add(i);
+        }
 
+        for (int i = 0; i < 10000; i++) {
+            list.add(-1);
+            list.delete(9999);
+        }
+    }
 }
