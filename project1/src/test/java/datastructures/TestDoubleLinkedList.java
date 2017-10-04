@@ -2,7 +2,6 @@ package datastructures;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import datastructures.concrete.DoubleLinkedList;
@@ -581,16 +580,63 @@ public class TestDoubleLinkedList extends BaseTest {
             // delete throws right exception, so do nothing
         }
     }
-    @Test(timeout=5 * SECOND)
+    
+    @Test(timeout=15 * SECOND)
     public void testAddAndDeleteIsEfficient() {
         IList<Integer> list = new DoubleLinkedList<>();
         for (int i = 0; i < 10000; i++) {
             list.add(i);
         }
 
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 500000; i++) {
             list.add(-1);
             list.delete(9999);
         }
+    }
+    
+    @Test(timeout=5 * SECOND)
+    public void testDeleteFromEndIsEfficient() {
+        IList<Integer> list = new DoubleLinkedList<>();
+        int cap = 500000;
+        for (int i = 0; i < cap; i++) {
+            list.add(i);
+        }
+        for (int i = 0; i < cap; i++) {
+            list.delete(cap-i-1);
+        }
+        assertEquals(0, list.size());
+    }
+    
+    @Test(timeout=SECOND)
+    public void testDeleteShiftOperation() {
+        IList<Integer> list = new DoubleLinkedList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        this.assertListMatches(new Integer[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, list);
+        list.delete(0);
+        this.assertListMatches(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9}, list);
+        list.delete(8);
+        this.assertListMatches(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8}, list); 
+    }
+    @Test(timeout=SECOND)
+    public void testDeleteNull() {
+        IList<Integer> list = new DoubleLinkedList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        list.delete(2);
+    }
+    @Test(timeout=15*SECOND)
+    public void testDeleteFromFrontIsEfficient() {
+        int cap = 5000000;
+        IList<Integer> list = new DoubleLinkedList<>();
+        for (int i = 0; i < cap; i++) {
+            list.add(i);
+        }
+        for (int i = 0; i < cap; i++) {
+            list.delete(0);
+        }
+        assertEquals(0, list.size());
     }
 }

@@ -191,7 +191,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             throw new IndexOutOfBoundsException();
         }
         else if (size == 1) {
-            // delete the only element in list
+            // delete the only element in linked list
             T value = front.data;
             front = null;
             back = null;
@@ -199,7 +199,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             return value;
         }
         else if (index == 0){
-            // delete the first node in list
+            // delete the first node in linked list
             T value = front.data;
             front = front.next;
             front.prev = null;
@@ -207,7 +207,7 @@ public class DoubleLinkedList<T> implements IList<T> {
             return value;
         }
         else if (index == size-1) {
-            // delete the last node in list
+            // delete the last node in linked list
             T value = back.data;
             back = back.prev;
             back.next = null;
