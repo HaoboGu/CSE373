@@ -1,9 +1,12 @@
 package calculator.ast;
 
 import calculator.interpreter.Environment;
+//import calculator.ast.AstNode.ExprType;
 import calculator.errors.EvaluationError;
+import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IDictionary;
-import misc.exceptions.NotYetImplementedException;
+import datastructures.interfaces.IList;
+import calculator.gui.ImageDrawer;
 
 /**
  * All of the static methods in this class are given the exact same parameters for
@@ -24,51 +27,51 @@ public class ExpressionManipulators {
      */
     public static AstNode toDouble(Environment env, AstNode node) {
         // To help you get started, we've implemented this method for you.
-        // You should fill in the TODOs in the 'toDoubleHelper' method.
+        // You should fill in the TO DO s in the 'toDoubleHelper' method.
         return new AstNode(toDoubleHelper(env.getVariables(), node));
     }
 
     private static double toDoubleHelper(IDictionary<String, AstNode> variables, AstNode node) {
         // There are three types of nodes, so we have three cases.
         if (node.isNumber()) {
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            return node.getNumericValue();
         } else if (node.isVariable()) {
             if (!variables.containsKey(node.getName())) {
                 // If the expression contains an undefined variable, we give up.
                 throw new EvaluationError("Undefined variable: " + node.getName());
             }
-            // TODO: your code here
-            throw new NotYetImplementedException();
+            // System.out.println(variables.get(node.getName()));
+            return toDoubleHelper(variables, variables.get(node.getName()));
         } else {
             String name = node.getName();
-
-            // TODO: your code here
-
-            if (name.equals("+")) {
-                // TODO: your code here
-                throw new NotYetImplementedException();
+            if (name.equals("simplify")) {            
+                System.out.println("simplify in toDouble!");
+                return toDoubleHelper(variables, node.getChildren().get(0));
+            }
+            else if (name.equals("toDouble")){
+                return toDoubleHelper(variables, node.getChildren().get(0));
+            }
+            else if (name.equals("+")) {
+                return toDoubleHelper(variables, node.getChildren().get(0)) 
+                        + toDoubleHelper(variables, node.getChildren().get(1));
             } else if (name.equals("-")) {
-                // TODO: your code here
-                throw new NotYetImplementedException();
+                return toDoubleHelper(variables, node.getChildren().get(0)) 
+                        - toDoubleHelper(variables, node.getChildren().get(1));
             } else if (name.equals("*")) {
-                // TODO: your code here
-                throw new NotYetImplementedException();
+                return toDoubleHelper(variables, node.getChildren().get(0)) 
+                        * toDoubleHelper(variables, node.getChildren().get(1));
             } else if (name.equals("/")) {
-                // TODO: your code here
-                throw new NotYetImplementedException();
+                return toDoubleHelper(variables, node.getChildren().get(0)) 
+                        / toDoubleHelper(variables, node.getChildren().get(1));
             } else if (name.equals("^")) {
-                // TODO: your code here
-                throw new NotYetImplementedException();
+                return Math.pow(toDoubleHelper(variables, node.getChildren().get(0)), 
+                        toDoubleHelper(variables, node.getChildren().get(1)));
             } else if (name.equals("negate")) {
-                // TODO: your code here
-                throw new NotYetImplementedException();
+                return -toDoubleHelper(variables, node.getChildren().get(0));
             } else if (name.equals("sin")) {
-                // TODO: your code here
-                throw new NotYetImplementedException();
+                return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
             } else if (name.equals("cos")) {
-                // TODO: your code here
-                throw new NotYetImplementedException();
+                return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
             } else {
                 throw new EvaluationError("Unknown operation: " + name);
             }
@@ -81,10 +84,54 @@ public class ExpressionManipulators {
         //         to your "toDouble" method
         // Hint 2: When you're implementing constant folding, you may want
         //         to call your "toDouble" method in some way
-
-        // TODO: Your code here
-        throw new NotYetImplementedException();
+        if (node.isNumber() || (node.isVariable() && (!env.getVariables().containsKey(node.getName())))) {
+            // If the node is number or undefined variable
+            return node;
+        }
+        else if (node.getName().equals("simplify") || node.getName().equals("toDouble")) {              
+            return simplify(env, node.getChildren().get(0));
+        }
+        else if (node.isVariable()) {
+            // If the variable is defined by num, return it; else do recursion 
+            // Here, variables.get(node)
+            return simplify(env, env.getVariables().get(node.getName()));
+        }
+        else {
+            // Operation
+                                        
+            return simplifyOperatorHelper(env, node);
+        }
     }
+    
+    private static AstNode simplifyOperatorHelper(Environment env, AstNode node) {
+        // Helper for operators
+        String name = node.getName(); // Get operator's name 
+        if (name.equals("+") || name.equals("-") || name.equals("*")) {
+            if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {                    
+                return toDouble(env, node);
+            } else {
+                IList<AstNode> newChildren = new DoubleLinkedList<>();
+                newChildren.add(simplify(env, node.getChildren().get(0)));
+                newChildren.add(simplify(env, node.getChildren().get(1)));
+                return new AstNode(name, newChildren);
+            }                               
+        }
+        else if (name.equals("/") || name.equals("^")) {
+            IList<AstNode> newChildren = new DoubleLinkedList<>();
+            newChildren.add(simplify(env, node.getChildren().get(0)));
+            newChildren.add(simplify(env, node.getChildren().get(1)));
+            return new AstNode(name, newChildren);
+        }   
+        else if (name.equals("cos") || name.equals("sin") || name.equals("negate")) {
+            IList<AstNode> newChildren = new DoubleLinkedList<>();
+            newChildren.add(simplify(env, node.getChildren().get(0)));
+            return new AstNode(name, newChildren);
+        }
+        else {
+            throw new EvaluationError("EvaluationError: Symbol not defined");
+        }
+    }
+        
 
     /**
      * Expected signature of plot:
@@ -118,9 +165,62 @@ public class ExpressionManipulators {
      * @throws EvaluationError  if 'var' was already defined
      * @throws EvaluationError  if 'step' is zero or negative
      */
+    
+    private static void drawImage(Environment env, AstNode exp, 
+            AstNode var, double varMin, double varMax, double step) {
+        IDictionary<String, AstNode> variables = env.getVariables();
+        ImageDrawer drawer = env.getImageDrawer();
+        IList<Double> xValues = new DoubleLinkedList<>();
+        IList<Double> yValues = new DoubleLinkedList<>();
+        for (double v = varMin; v <= varMax; v = v + step) {
+            variables.put(var.getName(), new AstNode(v));
+            double yValue = toDoubleHelper(variables, exp);
+            xValues.add(v);
+            yValues.add(yValue);
+        }
+        drawer.drawScatterPlot("plot", "x", "output", xValues, yValues);
+        variables.remove(var.getName());
+    }
     public static AstNode plot(Environment env, AstNode node) {
-        throw new NotYetImplementedException();
-
+        IDictionary<String, AstNode> variables = env.getVariables();
+        // First, check whether var is defined
+        if (variables.containsKey(node.getChildren().get(1).getName())) {   
+            throw new EvaluationError("EvaluationError: var was already defined");           
+        }
+        
+        // Var is not defined, give var a value to check expr
+        variables.put(node.getChildren().get(1).getName(), new AstNode(0));
+        //  Check expr
+        try {          
+            toDoubleHelper(variables, node.getChildren().get(0));
+        } catch (EvaluationError ex) {
+            throw new EvaluationError("EvaluationError: expr contains undefined variables");
+        }
+        variables.remove(node.getChildren().get(1).getName()); // Remove var in dictionary
+        
+        // Check varMin, varMax, step
+        double varMin = 0;
+        double varMax = 0;
+        double step = 0;
+        try {
+            varMin = toDoubleHelper(variables, node.getChildren().get(2));
+            varMax = toDoubleHelper(variables, node.getChildren().get(3));
+            step = toDoubleHelper(variables, node.getChildren().get(4));
+        }
+        catch (EvaluationError ex) {
+            throw new EvaluationError("EvaluationError: paras contains undefined variables");
+        }
+        
+        if (varMin > varMax) {
+            throw new EvaluationError("EvaluationError: varMin > varMax");
+        }
+        else if (step <= 0) {
+            throw new EvaluationError("EvaluationError: step is zerp or negative");
+        }
+        else {
+            drawImage(env, node.getChildren().get(0), node.getChildren().get(1), 
+                    varMin, varMax, step);           
+        }
         // Note: every single function we add MUST return an
         // AST node that your "simplify" function is capable of handling.
         // However, your "simplify" function doesn't really know what to do
@@ -130,6 +230,6 @@ public class ExpressionManipulators {
         //
         // When working on this method, you should uncomment the following line:
         //
-        // return new AstNode(1);
+        return new AstNode(1);
     }
 }

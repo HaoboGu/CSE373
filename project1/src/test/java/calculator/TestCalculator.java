@@ -177,7 +177,6 @@ public class TestCalculator extends BaseTest {
     public void testPlotCleansUpVariable() {
         Calculator calc = new Calculator();
         calc.setImageDrawer(new FakeImageDrawer());
-
         calc.evaluate("plot(3 * x, x, 0, 10, 1)");
         assertEquals("x", calc.evaluate("x"));
     }
@@ -206,6 +205,23 @@ public class TestCalculator extends BaseTest {
             fail("Expected EvaluationError");
         } catch (EvaluationError err) {
             // Do nothing
+            
+        }
+        calc.evaluate("u := y+1");
+        try {
+            calc.evaluate("plot(3 * u, x, 0, 10, 1)");
+            fail("Expected EvaluationError");
+        } catch (EvaluationError err) {
+            // Do nothing
+            
+        }
+        calc.evaluate("u := 1+y");
+        try {
+            calc.evaluate("plot(u+x, x, 0, 10, 1)");
+            fail("Expected EvaluationError");
+        } catch (EvaluationError err) {
+            // Do nothing
+            
         }
     }
 
