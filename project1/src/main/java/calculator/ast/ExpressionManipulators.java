@@ -44,11 +44,7 @@ public class ExpressionManipulators {
             return toDoubleHelper(variables, variables.get(node.getName()));
         } else {
             String name = node.getName();
-            if (name.equals("simplify")) {            
-                System.out.println("simplify in toDouble!");
-                return toDoubleHelper(variables, node.getChildren().get(0));
-            }
-            else if (name.equals("toDouble")){
+            if (name.equals("toDouble")){
                 return toDoubleHelper(variables, node.getChildren().get(0));
             }
             else if (name.equals("+")) {
@@ -72,7 +68,12 @@ public class ExpressionManipulators {
                 return Math.sin(toDoubleHelper(variables, node.getChildren().get(0)));
             } else if (name.equals("cos")) {
                 return Math.cos(toDoubleHelper(variables, node.getChildren().get(0)));
-            } else {
+            } else if (name.equals("cosh")) {
+                return Math.cosh(toDoubleHelper(variables, node.getChildren().get(0)));
+            } else if (name.equals("sinh")) {
+                return Math.sinh(toDoubleHelper(variables, node.getChildren().get(0)));
+            }
+            else {
                 throw new EvaluationError("Unknown operation: " + name);
             }
         }
@@ -97,8 +98,7 @@ public class ExpressionManipulators {
             return simplify(env, env.getVariables().get(node.getName()));
         }
         else {
-            // Operation
-                                        
+            // Operation                                       
             return simplifyOperatorHelper(env, node);
         }
     }
@@ -107,12 +107,15 @@ public class ExpressionManipulators {
         // Helper for operators
         String name = node.getName(); // Get operator's name 
         if (name.equals("+") || name.equals("-") || name.equals("*")) {
-            if (node.getChildren().get(0).isNumber() && node.getChildren().get(1).isNumber()) {                    
+            if (node.getChildren().get(0).isNumber() 
+                    && node.getChildren().get(1).isNumber()) {                                    
+                System.out.println(node.getChildren().get(0).getNumericValue());
                 return toDouble(env, node);
             } else {
                 IList<AstNode> newChildren = new DoubleLinkedList<>();
                 newChildren.add(simplify(env, node.getChildren().get(0)));
                 newChildren.add(simplify(env, node.getChildren().get(1)));
+                
                 return new AstNode(name, newChildren);
             }                               
         }
@@ -121,8 +124,9 @@ public class ExpressionManipulators {
             newChildren.add(simplify(env, node.getChildren().get(0)));
             newChildren.add(simplify(env, node.getChildren().get(1)));
             return new AstNode(name, newChildren);
-        }   
-        else if (name.equals("cos") || name.equals("sin") || name.equals("negate")) {
+        }  
+        else if (name.equals("cos") || name.equals("sin") || name.equals("negate") ||
+                name.equals("cosh") || name.equals("sinh")) {
             IList<AstNode> newChildren = new DoubleLinkedList<>();
             newChildren.add(simplify(env, node.getChildren().get(0)));
             return new AstNode(name, newChildren);
