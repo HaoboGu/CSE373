@@ -140,9 +140,12 @@ public class TestCalculator extends BaseTest {
 //        assertEqualsOneOf(
 //                new String[] {"2 + a + 8", "a + 10", "10 + a"},
 //                calc.evaluate("1 + 1 + a + 2 * 4"));
+//        assertEqualsOneOf(
+//                new String[] {"a + 4", "a + 10", "10 + a"},
+//                calc.evaluate("1 + 2 + 3 + 4 + a"));
         assertEqualsOneOf(
                 new String[] {"a + 4", "a + 10", "10 + a"},
-                calc.evaluate("1 + 2 + 3 + 4 + a"));
+                calc.evaluate("a+1+2+a+3+4"));
 //        assertEqualsOneOf(
 //                new String[] {"2 * (a + 4)", "2 * a + 8"},
 //                calc.evaluate("(1 + 1) * (a + 2 * (1 + 1))"));

@@ -98,25 +98,55 @@ public class ExpressionManipulators {
             return simplify(env, env.getVariables().get(node.getName()));
         }
         else {
-            // Operation                                       
+            // Operators                                      
             return simplifyOperatorHelper(env, node);
         }
     }
-    
+//    private static AstNode simplifyPlus(Environment env, AstNode node) {
+//        IList<AstNode> newChildren = new DoubleLinkedList<>();
+//        newChildren.add(simplify(env, node.getChildren().get(0)));       
+//        newChildren.add(simplify(env, node.getChildren().get(1)));
+//        if (newChildren.get(0).isNumber()) {
+//            // node.left is number
+//            if (newChildren.get(1).getChildren().get(0).isNumber()) {
+//                // node.right.left is number
+//                double tmp = newChildren.get(0).getNumericValue() + 
+//                        newChildren.get(1).getChildren().get(0).getNumericValue();
+//                newChildren.set(1, node.getChildren().get(1).getChildren().get(1));
+//                newChildren.set(0, new AstNode(tmp));
+//            }
+//            else if (newChildren.get(1).getChildren().get(1).isNumber()) {
+//                // node.right.right is number
+//                if (node.getName().equals("+") || node.getName().equals("*")) {
+//                    double tmp = newChildren.get(0).getNumericValue() + 
+//                            newChildren.get(1).getChildren().get(1).getNumericValue();
+//                    newChildren.set(1, node.getChildren().get(1).getChildren().get(0));
+//                    newChildren.set(0, new AstNode(tmp));
+//                }
+//                else {
+//                // node.right.right 
+//                }
+//            }      
+//        }
+//        return new AstNode(node.getName(), newChildren); 
+//    }
     private static AstNode simplifyOperatorHelper(Environment env, AstNode node) {
         // Helper for operators
         String name = node.getName(); // Get operator's name 
         if (name.equals("+") || name.equals("-") || name.equals("*")) {
             if (node.getChildren().get(0).isNumber() 
-                    && node.getChildren().get(1).isNumber()) {                                    
-                System.out.println(node.getChildren().get(0).getNumericValue());
+                    && node.getChildren().get(1).isNumber()) {
                 return toDouble(env, node);
             } else {
                 IList<AstNode> newChildren = new DoubleLinkedList<>();
                 newChildren.add(simplify(env, node.getChildren().get(0)));
                 newChildren.add(simplify(env, node.getChildren().get(1)));
-                
-                return new AstNode(name, newChildren);
+                if (newChildren.get(0).isNumber() && newChildren.get(1).isNumber()) {
+                    return toDouble(env, new AstNode(name, newChildren));
+                }
+                else {
+                    return new AstNode(name, newChildren);
+                }
             }                               
         }
         else if (name.equals("/") || name.equals("^")) {
