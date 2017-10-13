@@ -1,2 +1,3 @@
 1. My name is Haobo Gu
-2. Part2 is a little bit difficult. I have to consider too many cases, that makes my code very complex. But in total, the project is excellent. 
+2. Part2 is a little bit difficult. I have to consider too many cases, that makes my code very complex. But overall, the project is excellent. 
+3. The description of project tasks can be more detailed. It can be even better if there is a detailed rubric.  
