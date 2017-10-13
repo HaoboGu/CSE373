@@ -1,9 +1,5 @@
 package calculator;
 
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import calculator.gui.ImageDrawer;
@@ -137,20 +133,36 @@ public class TestCalculator extends BaseTest {
     @Test(timeout=SECOND)
     public void testSimplification() {
         Calculator calc = new Calculator();
-//        assertEqualsOneOf(
-//                new String[] {"2 + a + 8", "a + 10", "10 + a"},
-//                calc.evaluate("1 + 1 + a + 2 * 4"));
-//        assertEqualsOneOf(
-//                new String[] {"a + 4", "a + 10", "10 + a"},
-//                calc.evaluate("1 + 2 + 3 + 4 + a"));
         assertEqualsOneOf(
-                new String[] {"a + 4", "a + 10", "10 + a"},
-                calc.evaluate("a+1+2+a+3+4"));
-//        assertEqualsOneOf(
-//                new String[] {"2 * (a + 4)", "2 * a + 8"},
-//                calc.evaluate("(1 + 1) * (a + 2 * (1 + 1))"));
+                new String[] {"2 + a + 8", "a + 10", "10 + a"},
+                calc.evaluate("1 + 1 + a + 2 * 4"));
+        assertEqualsOneOf(
+                new String[] {"2 + a + 8", "a + 10", "10 + a"},
+                calc.evaluate("1 + 1 + a + 2 * 4"));
+        assertEqualsOneOf(
+                new String[] {"2 * (a + 4)", "2 * a + 8"},
+                calc.evaluate("(1 + 1) * (a + 2 * (1 + 1))"));
     }
-
+    @Test(timeout=SECOND)
+    public void testVariableUpdate() {
+        Calculator calc = new Calculator();
+        assertEquals(
+                "x + 1",
+                calc.evaluate("y := x + 1"));
+        assertEquals(
+                "4",
+                calc.evaluate("x := 4"));
+        assertEquals(
+                "5",
+                calc.evaluate("y"));
+        assertEquals(
+                "6",
+                calc.evaluate("x := 6"));
+        assertEquals(
+                "7",
+                calc.evaluate("y"));
+    }
+    
     @Test(timeout=SECOND)
     public void testPlotInputs() {
         FakeImageDrawer drawer = new FakeImageDrawer();

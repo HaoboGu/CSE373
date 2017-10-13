@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-/**
- * TODO: Document
- */
+
 public class RuntimeAnalysis {
     // If a single test takes more then 5 seconds, give up -- it's too expensive.
     private static final int TIMEOUT = 5 * 1000;

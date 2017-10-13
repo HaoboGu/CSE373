@@ -102,34 +102,115 @@ public class ExpressionManipulators {
             return simplifyOperatorHelper(env, node);
         }
     }
-//    private static AstNode simplifyPlus(Environment env, AstNode node) {
-//        IList<AstNode> newChildren = new DoubleLinkedList<>();
-//        newChildren.add(simplify(env, node.getChildren().get(0)));       
-//        newChildren.add(simplify(env, node.getChildren().get(1)));
-//        if (newChildren.get(0).isNumber()) {
-//            // node.left is number
-//            if (newChildren.get(1).getChildren().get(0).isNumber()) {
-//                // node.right.left is number
-//                double tmp = newChildren.get(0).getNumericValue() + 
-//                        newChildren.get(1).getChildren().get(0).getNumericValue();
-//                newChildren.set(1, node.getChildren().get(1).getChildren().get(1));
-//                newChildren.set(0, new AstNode(tmp));
-//            }
-//            else if (newChildren.get(1).getChildren().get(1).isNumber()) {
-//                // node.right.right is number
-//                if (node.getName().equals("+") || node.getName().equals("*")) {
-//                    double tmp = newChildren.get(0).getNumericValue() + 
-//                            newChildren.get(1).getChildren().get(1).getNumericValue();
-//                    newChildren.set(1, node.getChildren().get(1).getChildren().get(0));
-//                    newChildren.set(0, new AstNode(tmp));
-//                }
-//                else {
-//                // node.right.right 
-//                }
-//            }      
-//        }
-//        return new AstNode(node.getName(), newChildren); 
-//    }
+    private static AstNode simplifyMultiply(Environment env, AstNode node) {
+        IList<AstNode> newChildren = new DoubleLinkedList<>();
+        AstNode left= simplify(env, node.getChildren().get(0));
+        AstNode right = simplify(env, node.getChildren().get(1));
+        if (left.isNumber() && right.isNumber()) {
+            return new AstNode((left.getNumericValue()+right.getNumericValue()));
+        }
+        else if (left.isNumber() && right.getName().equals(node.getName())) { 
+            // node.left is number, node.right is *           
+            if (right.getChildren().get(0).isNumber() && !right.getChildren().get(1).isNumber()) {
+                // node.right.left is number
+                double tmp = left.getNumericValue() * 
+                        right.getChildren().get(0).getNumericValue();
+                newChildren.add(right.getChildren().get(1));
+                newChildren.add(new AstNode(tmp));
+            }
+            else if (right.getChildren().get(1).isNumber()&& !right.getChildren().get(0).isNumber()) {
+                // node.right.right is number
+                double tmp = left.getNumericValue() * 
+                        right.getChildren().get(1).getNumericValue();
+                newChildren.add(right.getChildren().get(0));
+                newChildren.add(new AstNode(tmp));             
+            }   
+            else {
+                newChildren.add(left);
+                newChildren.add(right);
+            }
+        }
+        else if (right.isNumber() 
+                && left.getName().equals(node.getName())) { // node.right is number
+            if (left.getChildren().get(0).isNumber() && !left.getChildren().get(1).isNumber()) {
+                // node.left.left is number
+                double tmp = right.getNumericValue() * 
+                        left.getChildren().get(0).getNumericValue();
+                newChildren.add(left.getChildren().get(1));
+                newChildren.add(new AstNode(tmp));
+            }
+            else if (left.getChildren().get(1).isNumber() && !left.getChildren().get(0).isNumber()) {
+                // node.left.right is number
+                double tmp = right.getNumericValue() *
+                        left.getChildren().get(1).getNumericValue();
+                newChildren.add(left.getChildren().get(0));
+                newChildren.add(new AstNode(tmp));             
+            }
+            else {
+                newChildren.add(left);
+                newChildren.add(right);
+            }
+        }
+        else {
+            newChildren.add(left);
+            newChildren.add(right);
+        }
+        return new AstNode(node.getName(), newChildren);  
+    }
+    private static AstNode simplifyPlus(Environment env, AstNode node) {
+        IList<AstNode> newChildren = new DoubleLinkedList<>();
+        AstNode left= simplify(env, node.getChildren().get(0));
+        AstNode right = simplify(env, node.getChildren().get(1));
+        if (left.isNumber() && right.isNumber()) {
+            return new AstNode((left.getNumericValue()+right.getNumericValue()));
+        }
+        else if (left.isNumber() && right.getName().equals(node.getName())) { 
+            // node.left is number            
+            if (right.getChildren().get(0).isNumber() && !right.getChildren().get(1).isNumber()) {
+                // node.right.left is number
+                double tmp = left.getNumericValue() + 
+                        right.getChildren().get(0).getNumericValue();
+                newChildren.add(right.getChildren().get(1));
+                newChildren.add(new AstNode(tmp));
+            }
+            else if (right.getChildren().get(1).isNumber()&& !right.getChildren().get(0).isNumber()) {
+                // node.right.right is number
+                double tmp = left.getNumericValue() + 
+                        right.getChildren().get(1).getNumericValue();
+                newChildren.add(right.getChildren().get(0));
+                newChildren.add(new AstNode(tmp));             
+            } else {
+                newChildren.add(left);
+                newChildren.add(right);
+            }  
+        }
+        else if (right.isNumber() && left.getName().equals(node.getName())) { 
+            // node.right is number
+            if (left.getChildren().get(0).isNumber() && !left.getChildren().get(1).isNumber()) {
+                // node.left.left is number
+                double tmp = right.getNumericValue() + 
+                        left.getChildren().get(0).getNumericValue();
+                newChildren.add(left.getChildren().get(1));
+                newChildren.add(new AstNode(tmp));
+            }
+            else if (left.getChildren().get(1).isNumber() && !left.getChildren().get(0).isNumber()) {
+                // node.left.right is number
+                double tmp = right.getNumericValue() + 
+                        left.getChildren().get(1).getNumericValue();
+                newChildren.add(left.getChildren().get(0));
+                newChildren.add(new AstNode(tmp));             
+            }
+            else {
+                newChildren.add(left);
+                newChildren.add(right);
+            }
+        }
+        else {
+            newChildren.add(left);
+            newChildren.add(right);
+        }
+        return new AstNode(node.getName(), newChildren); 
+    }
     private static AstNode simplifyOperatorHelper(Environment env, AstNode node) {
         // Helper for operators
         String name = node.getName(); // Get operator's name 
@@ -138,13 +219,16 @@ public class ExpressionManipulators {
                     && node.getChildren().get(1).isNumber()) {
                 return toDouble(env, node);
             } else {
-                IList<AstNode> newChildren = new DoubleLinkedList<>();
-                newChildren.add(simplify(env, node.getChildren().get(0)));
-                newChildren.add(simplify(env, node.getChildren().get(1)));
-                if (newChildren.get(0).isNumber() && newChildren.get(1).isNumber()) {
-                    return toDouble(env, new AstNode(name, newChildren));
+                if (name.equals("+")) {
+                    return simplifyPlus(env, node);
+                }
+                else if (name.equals("*")) {
+                    return simplifyMultiply(env, node);  
                 }
                 else {
+                    IList<AstNode> newChildren = new DoubleLinkedList<>();
+                    newChildren.add(simplify(env, node.getChildren().get(0)));
+                    newChildren.add(simplify(env, node.getChildren().get(1)));
                     return new AstNode(name, newChildren);
                 }
             }                               
