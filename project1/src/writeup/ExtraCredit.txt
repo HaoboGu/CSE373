@@ -1,0 +1,4 @@
+Extra credit:
+I added a feature for the calculator to calculate and process sinh(x) and cosh(x) function. 
+
+The sample can be found in sinh.jpg
