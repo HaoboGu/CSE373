@@ -1,5 +1,10 @@
 package datastructures.concrete.dictionaries;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+import datastructures.concrete.KVPair;
+//import datastructures.concrete.DoubleLinkedList.Node;
 import datastructures.interfaces.IDictionary;
 import misc.exceptions.NoSuchKeyException;
 
@@ -9,7 +14,7 @@ import misc.exceptions.NoSuchKeyException;
 public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     // You may not change or rename this field: we will be inspecting
     // it using our private tests.
-    private Pair<K, V>[] pairs;
+    private KVPair<K, V>[] pairs;
 
     // You're encouraged to add extra fields (and helper methods) though!
     private int currentSize;
@@ -35,7 +40,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
      * Note that each element in the array will initially be null.
      */
     @SuppressWarnings("unchecked")
-    private Pair<K, V>[] makeArrayOfPairs(int arraySize) {
+    private KVPair<K, V>[] makeArrayOfPairs(int arraySize) {
         // It turns out that creating arrays of generic objects in Java
         // is complicated due to something known as 'type erasure'.
         //
@@ -46,7 +51,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         // You are not required to understand how this method works, what
         // type erasure is, or how arrays and generics interact. Do not
         // modify this method in any way.
-        return (Pair<K, V>[]) (new Pair[arraySize]);
+        return (KVPair<K, V>[]) (new KVPair[arraySize]);
 
     }
 
@@ -54,8 +59,8 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     public V get(K key) {
         // Search for the key, then return the value
         for (int i = 0; i < currentSize; i++) {
-            if (pairs[i].key == key || pairs[i].key.equals(key)) {
-                return pairs[i].value;
+            if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
+                return pairs[i].getValue();
             }
         }
         throw new NoSuchKeyException();        
@@ -66,23 +71,29 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         // If the array is full, double maxSize of the array first
         if (currentSize == maxSize) {
             maxSize = maxSize * 2;
-            Pair<K, V>[] newArray = this.makeArrayOfPairs(maxSize);
+            KVPair<K, V>[] newArray = this.makeArrayOfPairs(maxSize);
             // Move all elements from the old array to the new one
             for (int i = 0; i < currentSize; i++) {
-                newArray[i] = new Pair<K, V>(pairs[i].key, pairs[i].value);
+                newArray[i] = new KVPair<K, V>(pairs[i].getKey(), pairs[i].getValue());
             }
             // Use the new one
             pairs = newArray;
         }
         // Search the key, if it is in the array, update value
         for (int i = 0; i < currentSize; i++) {
-            if (pairs[i].key == key || pairs[i].key.equals(key)) {
-                pairs[i].value = value;
+            if (pairs[i].getKey() == null) {
+                if (key == null) {
+                    pairs[i] = new KVPair<K, V>(pairs[i].getKey(), value);
+                    return;
+                }
+            }
+            else if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
+                pairs[i] = new KVPair<K, V>(pairs[i].getKey(), value);
                 return;
             }
         }
         // If cannot find the key, add a new node
-        pairs[currentSize] = new Pair<K, V>(key, value);
+        pairs[currentSize] = new KVPair<K, V>(key, value);
         currentSize++;
         
     }
@@ -90,11 +101,10 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public V remove(K key) {
         for (int i = 0; i < currentSize; i++) {
-            if (pairs[i].key == key || pairs[i].key.equals(key)) {
-                V tmp = pairs[i].value;  // Store the value first
+            if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
+                V tmp = pairs[i].getValue();  // Store the value first
                 // Move the last node to this position and them delete the last node
-                pairs[i].key = pairs[currentSize-1].key;  
-                pairs[i].value = pairs[currentSize-1].value;
+                pairs[i] = new KVPair<K, V>(pairs[currentSize-1].getKey(), pairs[currentSize-1].getValue());
                 currentSize--;
                 return tmp;
             }
@@ -106,7 +116,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     public boolean containsKey(K key) {
         // Search the whole array
         for (int i = 0; i < currentSize; i++) {
-            if (pairs[i].key == key || pairs[i].key.equals(key)) {
+            if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
                 return true;
             }
         }
@@ -117,20 +127,59 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     public int size() {
         return currentSize;
     }
+    public Iterator<KVPair<K, V>> iterator() {       
+        return new DictionaryIterator<K, V>(this.pairs, this.size());
+    }
+    private static class DictionaryIterator<K, V> implements Iterator<KVPair<K, V>> {
+        // You should not need to change this field, or add any new fields.
+        private KVPair<K, V>[] current;
+        int index;
+        int pairsSize;
 
-    private static class Pair<K, V> {
-        public K key;
-        public V value;
-        
-        // You may add constructors and methods to this class as necessary.
-        public Pair(K key, V value) {
-            this.key = key;
-            this.value = value;
+        public DictionaryIterator(KVPair<K, V>[] pairs, int size){
+            // You do not need to make any changes to this constructor.
+            this.current = pairs;
+            this.index = 0;
+            this.pairsSize = size;
         }
-        
-        @Override
-        public String toString() {
-            return this.key + "=" + this.value;
+
+        /**
+         * Returns 'true' if the iterator still has elements to look at;
+         * returns 'false' otherwise.
+         */
+        public boolean hasNext() {
+            return !(this.index >= this.pairsSize);
+        }
+
+        /**
+         * Returns the next item in the iteration and internally updates the
+         * iterator to advance one element forward.
+         */
+        public KVPair<K, V> next() {
+            if (this.hasNext()) {
+                KVPair<K, V> tmp = current[index];
+                index++;
+                return tmp;
+            }
+            else {
+                throw new NoSuchElementException();
+            }
         }
     }
+//    private static class Pair<K, V> {
+//        public K key;
+//        public V value;
+//        
+//        // You may add constructors and methods to this class as necessary.
+//        public Pair(K key, V value) {
+//            this.key = key;
+//            this.value = value;
+//        }
+//        
+//        @Override
+//        public String toString() {
+//            return this.key + "=" + this.value;
+//        }
+//  }
+    
 }
