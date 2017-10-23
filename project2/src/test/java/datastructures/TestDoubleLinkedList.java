@@ -2,7 +2,6 @@ package datastructures;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import datastructures.concrete.DoubleLinkedList;
@@ -314,7 +313,7 @@ public class TestDoubleLinkedList extends BaseTest {
         this.assertListMatches(new String[] {"a", "b"}, list2);
     }
 
-    @Test(timeout=SECOND)
+    @Test
     public void testInsertOutOfBounds() {
         IList<String> list = this.makeBasicList();
 
@@ -523,5 +522,121 @@ public class TestDoubleLinkedList extends BaseTest {
             assertEquals(count, num);
             count += 2;
         }
+    }
+
+    @Test(timeout=SECOND)
+    public void testDeleteHappyCase() {
+        IList<Integer> list = this.makeInstance();
+        for (int i = 1; i < 6; i++) {
+            list.add(i);
+        }
+        list.delete(1);
+        this.assertListMatches(new Integer[] {1, 3, 4, 5}, list);
+        assertEquals(4, list.size());
+        list.delete(3);
+        this.assertListMatches(new Integer[] {1, 3, 4}, list);
+        assertEquals(3, list.size());
+        list.delete(0);
+        this.assertListMatches(new Integer[] {3, 4}, list);
+        assertEquals(2, list.size());
+        list.delete(1);
+        this.assertListMatches(new Integer[] {3}, list);
+        assertEquals(1, list.size());
+        list.delete(0);
+        assertEquals(0, list.size());
+    }
+
+    @Test(timeout=SECOND)
+    public void testDeleteEmpty() {
+        IList<Integer> list = this.makeInstance();
+        try {
+            list.delete(0);
+            // If delete function does not throw a correct exception, the test fails with a message
+            fail("Expected an IndexOutOfBoundsException"); 
+        }
+        catch(IndexOutOfBoundsException ex) {
+            // delete throws right exception, so do nothing
+        }
+    }
+
+    @Test(timeout=SECOND)
+    public void testDeleteIndexOutOfRange() {
+        IList<Integer> list = this.makeInstance();
+        list.add(1);
+        try {
+            list.delete(2);
+            // If delete function does not throw a correct exception, the test fails with a message
+            fail("Expected an IndexOutOfBoundsException"); 
+        }
+        catch(IndexOutOfBoundsException ex) {
+            // delete throws right exception, so do nothing
+        }
+        try {
+            list.delete(-1);
+            // If delete function does not throw a correct exception, the test fails with a message
+            fail("Expected an IndexOutOfBoundsException"); 
+        }
+        catch(IndexOutOfBoundsException ex) {
+            // delete throws right exception, so do nothing
+        }
+    }
+    
+    @Test(timeout=15 * SECOND)
+    public void testAddAndDeleteIsEfficient() {
+        IList<Integer> list = new DoubleLinkedList<>();
+        for (int i = 0; i < 10000; i++) {
+            list.add(i);
+        }
+
+        for (int i = 0; i < 500000; i++) {
+            list.add(-1);
+            list.delete(9999);
+        }
+    }
+    
+    @Test(timeout=5 * SECOND)
+    public void testDeleteFromEndIsEfficient() {
+        IList<Integer> list = new DoubleLinkedList<>();
+        int cap = 500000;
+        for (int i = 0; i < cap; i++) {
+            list.add(i);
+        }
+        for (int i = 0; i < cap; i++) {
+            list.delete(cap-i-1);
+        }
+        assertEquals(0, list.size());
+    }
+    
+    @Test(timeout=SECOND)
+    public void testDeleteShiftOperation() {
+        IList<Integer> list = new DoubleLinkedList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        this.assertListMatches(new Integer[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}, list);
+        list.delete(0);
+        this.assertListMatches(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8, 9}, list);
+        list.delete(8);
+        this.assertListMatches(new Integer[] {1, 2, 3, 4, 5, 6, 7, 8}, list); 
+    }
+    @Test(timeout=SECOND)
+    public void testDeleteNull() {
+        IList<Integer> list = new DoubleLinkedList<>();
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        list.delete(2);
+    }
+    @Test(timeout=15*SECOND)
+    public void testDeleteFromFrontIsEfficient() {
+        int cap = 5000000;
+        IList<Integer> list = new DoubleLinkedList<>();
+        for (int i = 0; i < cap; i++) {
+            list.add(i);
+        }
+        for (int i = 0; i < cap; i++) {
+            list.delete(0);
+        }
+        assertEquals(0, list.size());
     }
 }
