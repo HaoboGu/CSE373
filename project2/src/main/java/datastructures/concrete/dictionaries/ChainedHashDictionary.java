@@ -4,7 +4,7 @@ import datastructures.concrete.KVPair;
 import datastructures.interfaces.IDictionary;
 import misc.exceptions.NoSuchKeyException;
 import misc.exceptions.NotYetImplementedException;
-
+import java.lang.Math;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -17,9 +17,14 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     private IDictionary<K, V>[] chains;
 
     // You're encouraged to add extra fields (and helper methods) though!
-
+    private int currentSize;
+    private int maxSize;
+    @SuppressWarnings("unchecked")
     public ChainedHashDictionary() {
-        throw new NotYetImplementedException();
+        // Constructor
+        this.maxSize = 100;  // Default maxSize is 100
+        this.currentSize = 0;
+        this.chains = (IDictionary<K, V>[]) new IDictionary[this.maxSize];
     }
 
     /**
@@ -35,30 +40,98 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         // more background on why we need this method.
         return (IDictionary<K, V>[]) new IDictionary[size];
     }
-
+    private int hash(int hashCode) {
+        return (Math.abs(hashCode) % this.maxSize);
+    }
+    
     @Override
     public V get(K key) {
-        throw new NotYetImplementedException();
+        // TODO: consider the case that this key is null or ""
+        int hashedPos = 0;
+        if (key != null) {         
+            hashedPos = hash(key.hashCode());
+        }
+        if (this.chains[hashedPos] != null) {
+            if (this.chains[hashedPos].containsKey(key)) {
+                return this.chains[hashedPos].get(key);
+            }
+        }   
+        throw new NoSuchKeyException();
     }
-
+    
     @Override
     public void put(K key, V value) {
-        throw new NotYetImplementedException();
+        // TODO: put function, replace case need to be considered
+        int hashedPos = 0;
+        if (key != null) {         
+            hashedPos = hash(key.hashCode());
+        }
+        if (this.chains[hashedPos] == null) {
+            this.chains[hashedPos] = new ArrayDictionary<K, V>();
+        }
+        int pre_length = this.chains[hashedPos].size();
+        this.chains[hashedPos].put(key, value);
+//        System.out.print(key);
+//        System.out.print(value);
+        if (this.chains[hashedPos].size() > pre_length) {
+            this.currentSize++;
+        }
+        if (currentSize > 0.7 * this.maxSize) {
+            // resize and rehash
+            this.maxSize = this.maxSize * 2;
+            IDictionary<K, V>[] tmp = this.chains;
+            this.chains = (IDictionary<K, V>[]) new IDictionary[this.maxSize];
+            for (int i = 0; i < this.maxSize/2; i++) {
+                if (tmp[i] != null) {
+                    for (KVPair<K, V> item : tmp[i]) {
+                        int newHashedPos = 0;
+                        if (item.getKey() != null) {         
+                            newHashedPos = hash(item.getKey().hashCode());
+                        }
+                        if (this.chains[newHashedPos] == null) {
+                            this.chains[newHashedPos] = new ArrayDictionary<K, V>();
+                        }
+                        this.chains[newHashedPos].put(item.getKey(), item.getValue());
+
+                    }
+                }
+            }
+        }
     }
 
     @Override
     public V remove(K key) {
-        throw new NotYetImplementedException();
+        int hashedPos = 0;
+        if (key != null) {         
+            hashedPos = hash(key.hashCode());
+        }
+        if (this.chains[hashedPos] != null) {
+            if (this.chains[hashedPos].containsKey(key)) {
+                V value = this.chains[hashedPos].remove(key);
+                this.currentSize--;
+                return value;          
+            }
+        }
+        throw new NoSuchKeyException();
     }
 
     @Override
     public boolean containsKey(K key) {
-        throw new NotYetImplementedException();
+        int hashedPos = 0;
+        if (key != null) {         
+            hashedPos = hash(key.hashCode());
+        }
+        if (this.chains[hashedPos] != null) {
+            if (this.chains[hashedPos].containsKey(key)) {
+                return true;
+            }
+        }   
+        return false;
     }
 
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return this.currentSize;
     }
 
     @Override
@@ -105,19 +178,50 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
      */
     private static class ChainedIterator<K, V> implements Iterator<KVPair<K, V>> {
         private IDictionary<K, V>[] chains;
-
+        private int currentChain;
+        private Iterator<KVPair<K, V>> currentIterator;
         public ChainedIterator(IDictionary<K, V>[] chains) {
             this.chains = chains;
+            this.currentChain = 0;
+            while (this.chains[this.currentChain] == null && currentChain < this.chains.length) {
+                currentChain++;
+            }
+            this.currentIterator = this.chains[this.currentChain].iterator();
         }
-
+        
         @Override
         public boolean hasNext() {
-            throw new NotYetImplementedException();
+            if (this.currentIterator.hasNext()) {
+                return true;
+            }
+            else {
+                int index = this.currentChain;
+                while (this.chains[index] == null && index < this.chains.length) {
+                    index++;
+                }
+                return !(index >= this.chains.length);          
+            }
         }
 
         @Override
         public KVPair<K, V> next() {
-            throw new NotYetImplementedException();
+            if (this.currentIterator.hasNext()) {
+                return this.currentIterator.next();
+            }
+            else {
+                while (this.chains[this.currentChain] == null && currentChain < this.chains.length) {
+                    currentChain++;
+                }
+                
+                if (currentChain >= this.chains.length) {
+                    throw new NoSuchElementException();
+                }
+                else {
+                    this.currentIterator = this.chains[this.currentChain].iterator();
+                    return this.currentIterator.next();
+                }
+            }
+//            throw new NotYetImplementedException();
         }
     }
 }

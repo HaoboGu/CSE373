@@ -30,7 +30,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
         // If 
         pairs = this.makeArrayOfPairs(100);
         this.currentSize = 0;
-        this.maxSize = 100; // default size of dictionary is 100
+        this.maxSize = 10; // default size of dictionary is 10
     }
     
     /**
@@ -59,7 +59,12 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     public V get(K key) {
         // Search for the key, then return the value
         for (int i = 0; i < currentSize; i++) {
-            if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
+            if (pairs[i].getKey() == null) {
+                if (key == null) {
+                    return pairs[i].getValue();
+                }
+            }
+            else if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
                 return pairs[i].getValue();
             }
         }
@@ -101,7 +106,16 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public V remove(K key) {
         for (int i = 0; i < currentSize; i++) {
-            if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
+            if (pairs[i].getKey() == null) {
+                if (key == null) {
+                    V tmp = pairs[i].getValue();  // Store the value first
+                    // Move the last node to this position and them delete the last node                   
+                    pairs[i] = new KVPair<K, V>(pairs[currentSize-1].getKey(), pairs[currentSize-1].getValue());
+                    currentSize--;
+                    return tmp;
+                }
+            }
+            else if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
                 V tmp = pairs[i].getValue();  // Store the value first
                 // Move the last node to this position and them delete the last node
                 pairs[i] = new KVPair<K, V>(pairs[currentSize-1].getKey(), pairs[currentSize-1].getValue());
@@ -116,7 +130,10 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     public boolean containsKey(K key) {
         // Search the whole array
         for (int i = 0; i < currentSize; i++) {
-            if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
+            if (pairs[i].getKey() == null) {
+                return key == null;
+            }
+            else if (pairs[i].getKey() == key || pairs[i].getKey().equals(key)) {
                 return true;
             }
         }
@@ -166,20 +183,21 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
             }
         }
     }
-//    private static class Pair<K, V> {
-//        public K key;
-//        public V value;
-//        
-//        // You may add constructors and methods to this class as necessary.
-//        public Pair(K key, V value) {
-//            this.key = key;
-//            this.value = value;
-//        }
-//        
-//        @Override
-//        public String toString() {
-//            return this.key + "=" + this.value;
-//        }
-//  }
+    /*    private static class Pair<K, V> {
+        public K key;
+        public V value;
+        
+        // You may add constructors and methods to this class as necessary.
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+        
+        @Override
+        public String toString() {
+            return this.key + "=" + this.value;
+        }
+  }*/
+
     
 }

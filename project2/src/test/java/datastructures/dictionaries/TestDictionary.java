@@ -236,6 +236,7 @@ public abstract class TestDictionary extends BaseTest {
 
             for (int i = 0; i < cap; i++) {
                 int value = dict.get(i);
+                
                 assertEquals(i * 2, value);
             }
         }
