@@ -381,10 +381,9 @@ public abstract class TestDictionary extends BaseTest {
         IDictionary<String, String> dict = this.makeBasicDictionary();
 
         Iterator<KVPair<String, String>> iter = dict.iterator();
-
         for (int i = 0; i < dict.size(); i++) {
             for (int j = 0; j < 1000; j++) {
-                assertTrue(iter.hasNext());
+                assertTrue(iter.hasNext());        
             }
             iter.next();
         }

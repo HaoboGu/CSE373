@@ -3,7 +3,7 @@ package datastructures.concrete;
 import datastructures.concrete.dictionaries.ChainedHashDictionary;
 import datastructures.interfaces.IDictionary;
 import datastructures.interfaces.ISet;
-import misc.exceptions.NotYetImplementedException;
+import misc.exceptions.NoSuchKeyException;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -21,22 +21,27 @@ public class ChainedHashSet<T> implements ISet<T> {
 
     @Override
     public void add(T item) {
-        throw new NotYetImplementedException();
+        this.map.put(item, true);
     }
 
     @Override
     public void remove(T item) {
-        throw new NotYetImplementedException();
+        try {
+            this.map.remove(item);
+        }
+        catch (NoSuchKeyException ex) {
+            throw new NoSuchElementException();
+        }
     }
 
     @Override
     public boolean contains(T item) {
-        throw new NotYetImplementedException();
+        return map.containsKey(item);
     }
 
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return map.size();
     }
 
     @Override
@@ -54,12 +59,12 @@ public class ChainedHashSet<T> implements ISet<T> {
 
         @Override
         public boolean hasNext() {
-            throw new NotYetImplementedException();
+            return this.iter.hasNext();
         }
 
         @Override
         public T next() {
-            throw new NotYetImplementedException();
+            return this.iter.next().getKey();
         }
     }
 }

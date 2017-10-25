@@ -3,8 +3,6 @@ package datastructures.concrete.dictionaries;
 import datastructures.concrete.KVPair;
 import datastructures.interfaces.IDictionary;
 import misc.exceptions.NoSuchKeyException;
-import misc.exceptions.NotYetImplementedException;
-import java.lang.Math;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -46,7 +44,6 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     
     @Override
     public V get(K key) {
-        // TODO: consider the case that this key is null or ""
         int hashedPos = 0;
         if (key != null) {         
             hashedPos = hash(key.hashCode());
@@ -61,7 +58,6 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
     
     @Override
     public void put(K key, V value) {
-        // TODO: put function, replace case need to be considered
         int hashedPos = 0;
         if (key != null) {         
             hashedPos = hash(key.hashCode());
@@ -69,18 +65,16 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         if (this.chains[hashedPos] == null) {
             this.chains[hashedPos] = new ArrayDictionary<K, V>();
         }
-        int pre_length = this.chains[hashedPos].size();
+        int preLength = this.chains[hashedPos].size();
         this.chains[hashedPos].put(key, value);
-//        System.out.print(key);
-//        System.out.print(value);
-        if (this.chains[hashedPos].size() > pre_length) {
+        if (this.chains[hashedPos].size() > preLength) {
             this.currentSize++;
         }
         if (currentSize > 0.7 * this.maxSize) {
             // resize and rehash
             this.maxSize = this.maxSize * 2;
             IDictionary<K, V>[] tmp = this.chains;
-            this.chains = (IDictionary<K, V>[]) new IDictionary[this.maxSize];
+            this.chains = makeArrayOfChains(this.maxSize);
             for (int i = 0; i < this.maxSize/2; i++) {
                 if (tmp[i] != null) {
                     for (KVPair<K, V> item : tmp[i]) {
@@ -92,7 +86,6 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
                             this.chains[newHashedPos] = new ArrayDictionary<K, V>();
                         }
                         this.chains[newHashedPos].put(item.getKey(), item.getValue());
-
                     }
                 }
             }
@@ -183,21 +176,37 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         public ChainedIterator(IDictionary<K, V>[] chains) {
             this.chains = chains;
             this.currentChain = 0;
-            while (this.chains[this.currentChain] == null && currentChain < this.chains.length) {
-                currentChain++;
+            while (this.currentChain < this.chains.length) {
+                if (this.chains[this.currentChain] == null) {
+                    this.currentChain++;
+                }
+                else {
+                    break;
+                }                
             }
-            this.currentIterator = this.chains[this.currentChain].iterator();
+            if (this.currentChain < this.chains.length) {
+                this.currentIterator = this.chains[this.currentChain].iterator();
+            }
         }
         
         @Override
         public boolean hasNext() {
-            if (this.currentIterator.hasNext()) {
+            if (this.currentChain >= this.chains.length) {
+                return false;
+            }
+
+            if (this.currentIterator.hasNext()) {        
                 return true;
             }
             else {
-                int index = this.currentChain;
-                while (this.chains[index] == null && index < this.chains.length) {
-                    index++;
+                int index = this.currentChain + 1;
+                while (index < this.chains.length) {
+                    if (this.chains[index] == null) {
+                        index++;
+                    }
+                    else {
+                        break;
+                    }                
                 }
                 return !(index >= this.chains.length);          
             }
@@ -205,12 +214,21 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
 
         @Override
         public KVPair<K, V> next() {
-            if (this.currentIterator.hasNext()) {
+            if (this.currentChain >= this.chains.length) {
+                throw new NoSuchElementException();
+            }
+            else if (this.currentIterator.hasNext()) {
                 return this.currentIterator.next();
             }
             else {
-                while (this.chains[this.currentChain] == null && currentChain < this.chains.length) {
-                    currentChain++;
+                this.currentChain++;
+                while (currentChain < this.chains.length) {
+                    if (this.chains[this.currentChain] == null) {
+                        this.currentChain++;
+                    }
+                    else {
+                        break;
+                    }                
                 }
                 
                 if (currentChain >= this.chains.length) {
@@ -221,7 +239,6 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
                     return this.currentIterator.next();
                 }
             }
-//            throw new NotYetImplementedException();
         }
     }
 }
