@@ -1,12 +1,12 @@
 package datastructures.sorting;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+//import static org.junit.Assert.assertTrue;
+//import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import misc.BaseTest;
 import datastructures.concrete.ArrayHeap;
-import datastructures.interfaces.IList;
+//import datastructures.interfaces.IList;
 import datastructures.interfaces.IPriorityQueue;
 import misc.exceptions.EmptyContainerException;
 import misc.exceptions.NoSuchKeyException;
@@ -58,9 +58,8 @@ public class TestArrayHeapFunctionality extends BaseTest {
         }
         assertEquals(100, heap.size());
         List<Integer> newHeap = convertIList2List(heap);
-        System.out.println(heap.size());  // Check first
+//        System.out.println(heap.size());  // Check first
         Collections.sort(newHeap);
-        
         for (int i = 0; i < 100; i++) {
             assertEquals(newHeap.get(i), heap.removeMin());
         }
@@ -114,9 +113,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
             assertEquals(i, heap.removeMin());
         }
     }
-    
-   
-    
+
     @Test(timeout=SECOND)
     public void testInsertNull() {
         IPriorityQueue<Integer> heap = this.makeInstance(); 
@@ -165,64 +162,157 @@ public class TestArrayHeapFunctionality extends BaseTest {
     }
     
     @Test(timeout=SECOND)
-    public void testBasicRemove() {
+    public void testBasicRemoveAndPeek() {
         IPriorityQueue<Integer> heap = this.makeInstance(); 
         for (int i = 0; i < 10; i ++) {
             heap.insert(5-i);
         }
         List<Integer> newList = convertIList2List(heap);
+        Collections.sort(newList);
         for (int i = 0; i < 10; i ++) {
+            Integer p = heap.peekMin();
             Integer m = heap.removeMin();
             assertEquals(9-i, heap.size());
             assertEquals(m, newList.get(i));
+            assertEquals(p, newList.get(i));
         }
         assertEquals(0, heap.size());
-        
     }
-    
-    @Test(timeout=SECOND)
-    public void testBasicPeek() {
-        
-    }
-    
+
     @Test(timeout=SECOND)
     public void testRemoveFromEmpty() {
-        
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        try{
+            heap.removeMin();
+            fail("Successfully remove from empty heap.");
+        } catch (EmptyContainerException ex){
+            // Fine
+        }
+    }
+
+    @Test(timeout=SECOND)
+    public void testOverRemove() {
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        for (int i = 0; i < 10; i++) {
+            heap.insert(i);
+        }
+        try{
+            for (int i = 0; i < 11; i++) {
+                heap.removeMin();
+            }
+            fail("Successfully remove from empty heap.");
+        } catch (EmptyContainerException ex){
+            // Fine
+        }
     }
     
     @Test(timeout=SECOND)
     public void testPeekFromEmpty() {
-        
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        try{
+            heap.peekMin();
+            fail("Successfully peek from empty heap.");
+        } catch (EmptyContainerException ex){
+            // Fine
+        }
     }
     
     @Test(timeout=SECOND)
     public void testInsertPeekAndRemoveMany() {
-        
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        for (int i = 0; i < 5000; i++){
+            heap.insert(2*i);
+        }
+        assertEquals(5000, heap.size());
+        for (int i = 0; i < 5000; i++){
+            assertEquals(2*i, heap.removeMin());
+            Integer m = heap.peekMin();
+            assertEquals(2*(i+1), m);
+            assertEquals(4999-i, heap.size());
+        }
     }
     
     @Test(timeout=SECOND)
     public void testSizeAfterRemove() {
-        
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        for (int i = 0; i < 300; i++){
+            heap.insert(300-i);
+        }
+        for (int i = 0; i < 100; i++){
+            heap.removeMin();
+        }
+        assertEquals(200, heap.size());
+        for (int i = 0; i < 100; i++){
+            heap.removeMin();
+        }
+        assertEquals(100, heap.size());
+        for (int i = 0; i < 50; i++){
+            heap.removeMin();
+        }
+        assertEquals(50, heap.size());
+        for (int i = 0; i < 50; i++) {
+            heap.removeMin();
+            assertEquals(49-i, heap.size());
+        }
     }
     
     @Test(timeout=SECOND)
     public void testSizeAfterPeek() {
-        
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        for (int i = 0; i < 300; i++){
+            heap.insert(i);
+        }
+        for (int i = 0; i < 100; i++){
+            Integer p = heap.peekMin();
+            assertEquals(0, p);
+            assertEquals(300, heap.size());
+        }
+        for (int i = 0; i < 150; i++){
+            heap.removeMin();
+        }
+        assertEquals(150, heap.size());
+        for (int i = 0; i < 50; i++){
+            heap.peekMin();
+            assertEquals(150, heap.size());
+        }
+
+        for (int i = 0; i < 50; i++) {
+            heap.removeMin();
+        }
+        for (int i = 0; i < 100; i++){
+            heap.peekMin();
+        }
+        assertEquals(50, heap.size());
+
     }
 
     @Test(timeout=SECOND)
     public void testOrderAfterRemove() {
-        
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        for (int i = 0; i < 300; i++) {
+            heap.insert(300-i);
+        }
+        for (int i = 0; i < 150; i++) {
+            heap.removeMin();
+        }
+        List<Integer> newList = convertIList2List(heap);
+        Collections.sort(newList);
+        for (int i = 0; i < 150; i++) {
+             assertEquals(newList.get(i), heap.removeMin());
+        }
     }
-    
-    @Test(timeout=SECOND)
-    public void testOrderAfterRemoveMany() {
-        
-    }
-    
+
     @Test(timeout=SECOND)
     public void testNegativeElements() {
-        
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        for (int i = 0; i < 300; i++) {
+            heap.insert(-i);
+        }
+        List<Integer> newList = convertIList2List(heap);
+        Collections.sort(newList);
+        for (int i = 0; i < 300; i++) {
+            assertEquals(newList.get(i), heap.removeMin());
+        }
     }
     
 }
