@@ -25,6 +25,10 @@ hs_err_pid*
 .idea/**
 .idea/*.xml
 /.gradle/
+*/gradle/
+gradle/
+gradlew
+*.bat
 
 # data files
 */data/
