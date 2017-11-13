@@ -29,6 +29,9 @@ public class TestArrayHeapFunctionality extends BaseTest {
         for (int i = 0; i < l.size(); i++){
            newList.add(l.removeMin());
         }
+        for (int i = 0; i < newList.size(); i++){
+            l.insert(newList.get(i));
+        }
         return newList;
     }
     @Test(timeout=SECOND)
