@@ -17,11 +17,14 @@ public class ArrayHeap<T extends Comparable<T>> implements IPriorityQueue<T> {
     // You may NOT rename this field: we will be inspecting it within
     // our private tests.
     private T[] heap;
-
+    private int heapSize;
+    private int arraySize;
     // Feel free to add more fields and constants.
 
     public ArrayHeap() {
-        throw new NotYetImplementedException();
+        this.arraySize = 5;
+        this.heap = makeArrayOfT(arraySize); // Initial size is 5.
+        this.heapSize = 0;
     }
 
     /**
@@ -42,21 +45,51 @@ public class ArrayHeap<T extends Comparable<T>> implements IPriorityQueue<T> {
 
     @Override
     public T removeMin() {
-        throw new NotYetImplementedException();
+        T item = null;
+        this.heapSize--;
+        return item;
     }
 
     @Override
     public T peekMin() {
-        throw new NotYetImplementedException();
+       return this.heap[0]; //Index starting from 0
     }
 
+    private void swap(int pos1, int pos2) {
+        T tmp = this.heap[pos1];
+        this.heap[pos1] = this.heap[pos2];
+        this.heap[pos2] = tmp;
+    }
+    private void percolateUp() {
+        // TODO: Check this method again
+        // Percolate the last element up to a proper position
+        int curPos = this.heapSize - 1;
+        int prePos = (curPos - 1) / this.NUM_CHILDREN;  // Cal mother's index, index starting from 0
+        while (prePos >= 0 || this.heap[curPos].compareTo(this.heap[prePos]) < 0) {
+            swap(curPos, prePos);
+            curPos = prePos;
+            prePos = (curPos - 1) / this.NUM_CHILDREN;
+        }
+
+    }
     @Override
     public void insert(T item) {
-        throw new NotYetImplementedException();
+        // Check whether the array is full
+        if (this.heapSize == this.arraySize) {
+            this.arraySize = this.arraySize*2;  // Double the array
+            T[] newHeap = makeArrayOfT(this.arraySize);
+            for (int i = 0; i < this.heap.length; i++) {
+                newHeap[i] = this.heap[i];
+            }
+            this.heap = newHeap;
+        }
+        this.heap[this.heapSize] = item;
+        this.heapSize++;
+        this.percolateUp();
     }
 
     @Override
     public int size() {
-        throw new NotYetImplementedException();
+        return this.heapSize;
     }
 }
