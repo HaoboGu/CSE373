@@ -1,8 +1,10 @@
 package misc;
 
 import datastructures.interfaces.IList;
-import misc.exceptions.NotYetImplementedException;
-
+import datastructures.interfaces.IPriorityQueue;
+import misc.exceptions.EmptyContainerException;
+import datastructures.concrete.ArrayHeap;
+import datastructures.concrete.DoubleLinkedList;
 public class Searcher {
     /**
      * This method takes the input list and returns the top k elements
@@ -30,7 +32,38 @@ public class Searcher {
         //
         // - You should implement this method by using your ArrayHeap for the sake of
         //   efficiency.
-
-        throw new NotYetImplementedException();
+        if (input == null || input.size() == 0) {
+            throw new EmptyContainerException();
+        }
+        if (k < 0) {
+            throw new IllegalArgumentException();
+        }
+        else if (k == 0) {
+            return new DoubleLinkedList<>();
+        }
+        else {
+            if (k > input.size()) {
+                k = input.size();
+            }
+            IList<T> newList = new DoubleLinkedList<>();
+            IPriorityQueue<T> heap = new ArrayHeap<T>();
+            int listSize = input.size();
+            for (int i = 0; i < listSize; i++) {
+                if (i < k) {
+                    heap.insert(input.get(i));
+                }
+                else {
+                    if (input.get(i).compareTo(heap.peekMin())>0) {
+                        // New item in input is larger than the minimal value in heap
+                        heap.removeMin();
+                        heap.insert(input.get(i));
+                    }
+                }
+            }
+            for (int i = 0; i < k; i++) {
+                newList.add(heap.removeMin());
+            }
+            return newList;
+        }
     }
 }

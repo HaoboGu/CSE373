@@ -47,7 +47,7 @@ public class TestTopKSortFunctionality extends BaseTest {
         try {
             Searcher.topKSort(negK, list);
             fail("Fail: receive negative k");
-        }catch(EmptyContainerException ex) {
+        }catch(IllegalArgumentException ex) {
             // Fine
         }
     }
@@ -59,12 +59,8 @@ public class TestTopKSortFunctionality extends BaseTest {
         for (int i = 0; i < 20; i++) {
             list.add(i);
         }
-        try {
-            Searcher.topKSort(zero, list);
-            fail("Fail: receive zero k");
-        }catch(EmptyContainerException ex) {
-            // Fine
-        }
+        IList<Integer> topK = Searcher.topKSort(zero, list);
+        assertEquals(0, topK.size());
     }
 
     @Test(timeout=SECOND)
@@ -72,13 +68,12 @@ public class TestTopKSortFunctionality extends BaseTest {
         int largeK = 100;
         IList<Integer> list = new DoubleLinkedList<>();
         for (int i = 0; i < 20; i++) {
-            list.add(i);
+            list.add(20-i);
         }
-        try {
-            Searcher.topKSort(largeK, list);
-            fail("Fail: receive zero k");
-        }catch(EmptyContainerException ex) {
-            // Fine
+        IList<Integer> top = Searcher.topKSort(largeK, list);
+        assertEquals(20, top.size());
+        for (int i = 0; i < 20; i++) {
+            assertEquals(i+1, top.get(i));
         }
     }
 

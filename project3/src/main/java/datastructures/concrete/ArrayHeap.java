@@ -2,9 +2,8 @@ package datastructures.concrete;
 
 import datastructures.interfaces.IPriorityQueue;
 import misc.exceptions.EmptyContainerException;
-import misc.exceptions.NotYetImplementedException;
+import misc.exceptions.NoSuchKeyException;
 
-import java.util.Arrays;
 
 /**
  * See IPriorityQueue for details on what each method must do.
@@ -43,16 +42,53 @@ public class ArrayHeap<T extends Comparable<T>> implements IPriorityQueue<T> {
         return (T[]) (new Comparable[size]);
     }
 
+    private void percolateDown() {
+        if (this.heapSize >= 2){
+            // If heapSize < 2, percolateDown is not needed.
+            int curPos = 0;
+            while (curPos < this.heapSize && NUM_CHILDREN*curPos+1 < this.heapSize) {
+                int nextPos = NUM_CHILDREN*curPos+1;
+                T minChild = this.heap[nextPos];
+                for (int i = 0; i < NUM_CHILDREN && NUM_CHILDREN*curPos+i+1 < this.heapSize; i++){
+                    if (minChild.compareTo(this.heap[NUM_CHILDREN*curPos+i+1])>0){
+                        // minChild is greater than current child
+                        nextPos = NUM_CHILDREN*curPos+i+1;
+                        minChild = this.heap[nextPos];
+                    }
+                }
+                // Current node is greater than minimal child, swap
+                if (this.heap[curPos].compareTo(this.heap[nextPos])>0){
+                    this.heap[nextPos] = this.heap[curPos];
+                    this.heap[curPos] = minChild;
+                }
+                curPos = nextPos;
+            }
+        }
+
+    }
+
     @Override
     public T removeMin() {
-        T item = null;
-        this.heapSize--;
-        return item;
+        if (this.heapSize <= 0) {
+            throw new EmptyContainerException();
+        }
+        else {
+            T item = this.heap[0];
+            this.heap[0] = this.heap[this.heapSize-1];
+            this.heapSize--;
+            percolateDown();
+            return item;
+        }
     }
 
     @Override
     public T peekMin() {
-       return this.heap[0]; //Index starting from 0
+        if (this.heapSize == 0) {
+            throw new EmptyContainerException();
+        }
+        else {
+            return this.heap[0]; //Index starting from 0
+        }
     }
 
     private void swap(int pos1, int pos2) {
@@ -60,21 +96,25 @@ public class ArrayHeap<T extends Comparable<T>> implements IPriorityQueue<T> {
         this.heap[pos1] = this.heap[pos2];
         this.heap[pos2] = tmp;
     }
+
     private void percolateUp() {
-        // TODO: Check this method again
         // Percolate the last element up to a proper position
         int curPos = this.heapSize - 1;
-        int prePos = (curPos - 1) / this.NUM_CHILDREN;  // Cal mother's index, index starting from 0
-        while (prePos >= 0 || this.heap[curPos].compareTo(this.heap[prePos]) < 0) {
+        int prePos = (curPos - 1) / NUM_CHILDREN;  // Cal mother's index, index starting from 0
+        while (prePos >= 0 && this.heap[curPos].compareTo(this.heap[prePos]) < 0) {
             swap(curPos, prePos);
             curPos = prePos;
-            prePos = (curPos - 1) / this.NUM_CHILDREN;
+            prePos = (curPos - 1) / NUM_CHILDREN;
         }
-
     }
+     
     @Override
     public void insert(T item) {
         // Check whether the array is full
+        if (item == null) {
+            // Heap will not accept null entry
+            throw new NoSuchKeyException();
+        }
         if (this.heapSize == this.arraySize) {
             this.arraySize = this.arraySize*2;  // Double the array
             T[] newHeap = makeArrayOfT(this.arraySize);
