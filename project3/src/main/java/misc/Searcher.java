@@ -47,18 +47,19 @@ public class Searcher {
             }
             IList<T> newList = new DoubleLinkedList<>();
             IPriorityQueue<T> heap = new ArrayHeap<T>();
-            int listSize = input.size();
-            for (int i = 0; i < listSize; i++) {
-                if (i < k) {
-                    heap.insert(input.get(i));
+            int index = 0;
+            for (T item:input) {
+                if (index < k) {
+                    heap.insert(item);
                 }
                 else {
-                    if (input.get(i).compareTo(heap.peekMin())>0) {
+                    if (item.compareTo(heap.peekMin())>0) {
                         // New item in input is larger than the minimal value in heap
                         heap.removeMin();
-                        heap.insert(input.get(i));
+                        heap.insert(item);
                     }
                 }
+                index++;
             }
             for (int i = 0; i < k; i++) {
                 newList.add(heap.removeMin());

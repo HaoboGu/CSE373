@@ -24,8 +24,8 @@ public class TestArrayHeapFunctionality extends BaseTest {
         return new ArrayHeap<>();
     }
 
-    protected <T extends Comparable<T>> List<T> convertIList2List(IPriorityQueue<T> pq){
-        // Convert IList to List<T>, for easily sorting using Collections.sort 
+    protected <T extends Comparable<T>> List<T> convertHeap2List(IPriorityQueue<T> pq){
+        // Convert heap to List<T>, for easily sorting using Collections.sort 
         List<T> newList = new ArrayList<T>();
         int length = pq.size();
         for (int i = 0; i < length; i++){
@@ -36,6 +36,8 @@ public class TestArrayHeapFunctionality extends BaseTest {
         }
         return newList;
     }
+    
+    
     @Test(timeout=SECOND)
     public void testBasicSize() {
         IPriorityQueue<Integer> heap = this.makeInstance();
@@ -54,7 +56,29 @@ public class TestArrayHeapFunctionality extends BaseTest {
         assertEquals(4, heap.size());
     }
     
-
+    @Test(timeout=SECOND)
+    public void testFewElements() {
+        IPriorityQueue<Integer> heap = this.makeInstance();
+        heap.insert(1);
+        heap.insert(3);
+        heap.insert(2);
+        assertEquals(1, heap.peekMin());
+        assertEquals(1, heap.removeMin());
+        assertEquals(2, heap.removeMin());
+        assertEquals(3, heap.removeMin());
+        try {
+            heap.peekMin();
+            fail("Successfully peekMin for an empty heap");
+        } catch (EmptyContainerException e) {
+            // Fine
+        }
+        try {
+            heap.removeMin();
+            fail("Successfully removeMin for an empty heap");
+        } catch (EmptyContainerException e) {
+            // Fine
+        }
+    }
     @Test(timeout=SECOND)
     public void testInsert100() {
         IPriorityQueue<Integer> heap = this.makeInstance();
@@ -62,7 +86,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
             heap.insert(i);
         }
         assertEquals(100, heap.size());
-        List<Integer> newHeap = convertIList2List(heap);
+        List<Integer> newHeap = convertHeap2List(heap);
         Collections.sort(newHeap);
         for (int i = 0; i < 100; i++) {
             assertEquals(newHeap.get(i), heap.removeMin());
@@ -139,7 +163,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
         heap.insert(3);
         heap.insert(2);
         heap.insert(2);
-        List<Integer> newList = convertIList2List(heap);
+        List<Integer> newList = convertHeap2List(heap);
         Collections.sort(newList);
         for (int i = 0; i < 5; i++) {
             assertEquals(newList.get(i), heap.removeMin());
@@ -157,7 +181,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
             heap.insert(2);
         }
         assertEquals(104, heap.size());
-        List<Integer> newList = convertIList2List(heap);
+        List<Integer> newList = convertHeap2List(heap);
         Collections.sort(newList);
         for (int i = 0; i < 104; i++) {
             assertEquals(newList.get(i), heap.removeMin());
@@ -171,7 +195,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
         for (int i = 0; i < 10; i++) {
             heap.insert(5-i);
         }
-        List<Integer> newList = convertIList2List(heap);
+        List<Integer> newList = convertHeap2List(heap);
         Collections.sort(newList);
         for (int i = 0; i < 10; i++) {
             Integer p = heap.peekMin();
@@ -299,7 +323,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
         for (int i = 0; i < 150; i++) {
             heap.removeMin();
         }
-        List<Integer> newList = convertIList2List(heap);
+        List<Integer> newList = convertHeap2List(heap);
         Collections.sort(newList);
         for (int i = 0; i < 150; i++) {
             assertEquals(newList.get(i), heap.removeMin());
@@ -312,7 +336,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
         for (int i = 0; i < 300; i++) {
             heap.insert(-i);
         }
-        List<Integer> newList = convertIList2List(heap);
+        List<Integer> newList = convertHeap2List(heap);
         Collections.sort(newList);
         for (int i = 0; i < 300; i++) {
             assertEquals(newList.get(i), heap.removeMin());
