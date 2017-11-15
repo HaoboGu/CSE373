@@ -32,10 +32,13 @@ public class Searcher {
         //
         // - You should implement this method by using your ArrayHeap for the sake of
         //   efficiency.
-        if (input == null || input.size() == 0) {
+        if (input == null) {
             throw new EmptyContainerException();
         }
-        if (k < 0) {
+        else if (input.size() == 0) {
+            return input;
+        }
+        else if (k < 0) {
             throw new IllegalArgumentException();
         }
         else if (k == 0) {
