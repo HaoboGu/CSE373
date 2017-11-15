@@ -29,12 +29,9 @@ public class TestTopKSortFunctionality extends BaseTest {
     @Test(timeout=SECOND)
     public void testEmptyInputArray() {
         IList<Integer> list = new DoubleLinkedList<>();
-        try {
-            Searcher.topKSort(5, list);
-            fail("Fail: receive empty list");
-        }catch(EmptyContainerException ex) {
-            // Fine
-        }
+        IList<Integer> orderedList = Searcher.topKSort(5, list);
+        assertEquals(0, orderedList.size());
+        
     }
 
     @Test(timeout=SECOND)
@@ -42,7 +39,7 @@ public class TestTopKSortFunctionality extends BaseTest {
         int negK = -5;
         IList<Integer> list = new DoubleLinkedList<>();
         for (int i = 0; i < 20; i++) {
-            list.add(i);
+            list.add(-i);
         }
         try {
             Searcher.topKSort(negK, list);
@@ -57,7 +54,7 @@ public class TestTopKSortFunctionality extends BaseTest {
         int zero = 0;
         IList<Integer> list = new DoubleLinkedList<>();
         for (int i = 0; i < 20; i++) {
-            list.add(i);
+            list.add(2*i);
         }
         IList<Integer> topK = Searcher.topKSort(zero, list);
         assertEquals(0, topK.size());
