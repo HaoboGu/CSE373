@@ -90,7 +90,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
         Collections.sort(newHeap);
         for (int i = 0; i < 100; i++) {
             assertEquals(newHeap.get(i), heap.removeMin());
-        }
+        }        
     }
     
     @Test(timeout=SECOND)
