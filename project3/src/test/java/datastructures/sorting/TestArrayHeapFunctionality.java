@@ -100,8 +100,10 @@ public class TestArrayHeapFunctionality extends BaseTest {
         heap.insert(2);
         heap.insert(3);
         heap.insert(4);
-        assertEquals(4, heap.size());
-        for (int i = 1; i < 5; i++) {
+        heap.insert(5);
+        heap.insert(6);
+        assertEquals(6, heap.size());
+        for (int i = 1; i < 7; i++) {
             assertEquals(i, heap.removeMin());
         }
     }
@@ -109,11 +111,11 @@ public class TestArrayHeapFunctionality extends BaseTest {
     @Test(timeout=SECOND)
     public void testReversedOrderedInsertFew() {
         IPriorityQueue<Integer> heap = this.makeInstance();
-        for (int i = 0; i < 4; i++) {
-            heap.insert(4-i);
+        for (int i = 0; i < 10; i++) {
+            heap.insert(10-i);
         }
-        assertEquals(4, heap.size());
-        for (int i = 1; i < 5; i++) {
+        assertEquals(10, heap.size());
+        for (int i = 1; i < 11; i++) {
             assertEquals(i, heap.removeMin());
         }
     }

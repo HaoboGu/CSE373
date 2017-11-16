@@ -10,8 +10,6 @@ import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IList;
 import datastructures.interfaces.IPriorityQueue;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -45,11 +43,6 @@ public class TestSortingStress extends BaseTest {
             newList.add(item);
         }
         return newList;
-    }
-    
-    @Test(timeout=10*SECOND)
-    public void testPlaceholder() {
-        assertTrue(true);
     }
     
     @Test(timeout=10*SECOND)
