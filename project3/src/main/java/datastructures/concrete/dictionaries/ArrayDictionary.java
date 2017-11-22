@@ -74,7 +74,7 @@ public class ArrayDictionary<K, V> implements IDictionary<K, V> {
     @Override
     public void put(K key, V value) {
         // If the array is full, double maxSize of the array first
-        if (currentSize == maxSize) {
+        if (currentSize >= 0.25 * maxSize) {
             maxSize = maxSize * 2;
             KVPair<K, V>[] newArray = this.makeArrayOfPairs(maxSize);
             // Move all elements from the old array to the new one

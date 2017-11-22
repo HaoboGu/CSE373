@@ -32,14 +32,14 @@ public class Searcher {
         //
         // - You should implement this method by using your ArrayHeap for the sake of
         //   efficiency.
-        if (input == null) {
+        if (k < 0) {
+            throw new IllegalArgumentException();
+        }
+        else if (input == null) {
             throw new EmptyContainerException();
         }
         else if (input.size() == 0) {
             return input;
-        }
-        else if (k < 0) {
-            throw new IllegalArgumentException();
         }
         else if (k == 0) {
             return new DoubleLinkedList<>();

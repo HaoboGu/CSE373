@@ -60,42 +60,44 @@ public class TestSortingStress extends BaseTest {
     
     @Test(timeout=15*SECOND)
     public void testStressTopK() {
+        int k = 2000000;
         IList<Integer> list = new DoubleLinkedList<>();
         for (int i = 0; i < 5000000; i++) {
             list.add(-2*i);
         }
-        IList<Integer> orderedList = Searcher.topKSort(2000000, list);
+        IList<Integer> orderedList = Searcher.topKSort(k, list);
         List<Integer> newList = convertIList2List(list);
-        assertEquals(2000000, orderedList.size());
+        assertEquals(k, orderedList.size());
         Collections.sort(newList);
         Collections.reverse(newList);
-        List<Integer> goldStandard = newList.subList(0, 2000000);
+        List<Integer> goldStandard = newList.subList(0, k);
         Collections.reverse(goldStandard);
         Iterator<Integer> i1 = orderedList.iterator();
         Iterator<Integer> i2 = goldStandard.iterator();
         
-        for (int i = 0; i < 2000000; i++) {
+        for (int i = 0; i < k; i++) {
             assertEquals(i2.next(), i1.next());
         }
     }
     
     @Test(timeout=15*SECOND)
     public void testStressTopLargeK() {
+        int k = 6000000;
         IList<Integer> list = new DoubleLinkedList<>();
-        for (int i = 0; i < 5000000; i++) {
+        for (int i = 0; i < k; i++) {
             list.add(-2*i);
         }
-        IList<Integer> orderedList = Searcher.topKSort(5000000, list);
+        IList<Integer> orderedList = Searcher.topKSort(k, list);
         List<Integer> newList = convertIList2List(list);
-        assertEquals(5000000, orderedList.size());
+        assertEquals(k, orderedList.size());
         Collections.sort(newList);
         Collections.reverse(newList);
-        List<Integer> goldStandard = newList.subList(0, 5000000);
+        List<Integer> goldStandard = newList.subList(0, k);
         Collections.reverse(goldStandard);
         Iterator<Integer> i1 = orderedList.iterator();
         Iterator<Integer> i2 = goldStandard.iterator();
         
-        for (int i = 0; i < 5000000; i++) {
+        for (int i = 0; i < k; i++) {
             assertEquals(i2.next(), i1.next());
         }
     }

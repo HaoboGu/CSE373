@@ -2,7 +2,6 @@ package datastructures.concrete;
 
 import datastructures.interfaces.IPriorityQueue;
 import misc.exceptions.EmptyContainerException;
-import misc.exceptions.NoSuchKeyException;
 
 
 /**
@@ -113,7 +112,8 @@ public class ArrayHeap<T extends Comparable<T>> implements IPriorityQueue<T> {
         // Check whether the array is full
         if (item == null) {
             // Heap will not accept null entry
-            throw new NoSuchKeyException();
+            //throw new EmptyContainerException();
+            return;
         }
         if (this.heapSize == this.arraySize) {
             this.arraySize = this.arraySize*2;  // Double the array

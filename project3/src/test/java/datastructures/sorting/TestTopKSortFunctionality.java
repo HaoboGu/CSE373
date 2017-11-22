@@ -5,7 +5,6 @@ import datastructures.concrete.DoubleLinkedList;
 import datastructures.interfaces.IList;
 import misc.Searcher;
 import static org.junit.Assert.fail;
-import misc.exceptions.EmptyContainerException;
 import org.junit.Test;
 
 /**
@@ -44,7 +43,7 @@ public class TestTopKSortFunctionality extends BaseTest {
         try {
             Searcher.topKSort(negK, list);
             fail("Fail: receive negative k");
-        }catch(IllegalArgumentException ex) {
+        }catch(Exception ex) {
             // Fine
         }
     }
@@ -80,7 +79,7 @@ public class TestTopKSortFunctionality extends BaseTest {
         try {
             Searcher.topKSort(5, list);
             fail("Fail: receive null list");
-        }catch(EmptyContainerException ex) {
+        }catch(Exception ex) {
             // Fine
         }
     }

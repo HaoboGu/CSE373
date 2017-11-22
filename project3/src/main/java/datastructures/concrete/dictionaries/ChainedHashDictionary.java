@@ -70,7 +70,7 @@ public class ChainedHashDictionary<K, V> implements IDictionary<K, V> {
         if (this.chains[hashedPos].size() > preLength) {
             this.currentSize++;
         }
-        if (currentSize > 0.7 * this.maxSize) {
+        if (currentSize > 3 * this.maxSize) {
             // resize and rehash
             this.maxSize = this.maxSize * 2;
             IDictionary<K, V>[] tmp = this.chains;

@@ -9,7 +9,6 @@ import datastructures.concrete.ArrayHeap;
 //import datastructures.interfaces.IList;
 import datastructures.interfaces.IPriorityQueue;
 import misc.exceptions.EmptyContainerException;
-import misc.exceptions.NoSuchKeyException;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
@@ -152,7 +151,7 @@ public class TestArrayHeapFunctionality extends BaseTest {
             heap.insert(null);
             fail("Insert null successfully");
         }
-        catch (NoSuchKeyException ex){
+        catch (Exception ex){
             // all right
         }
     }
