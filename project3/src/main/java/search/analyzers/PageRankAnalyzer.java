@@ -68,7 +68,7 @@ public class PageRankAnalyzer {
         }
         for (Webpage page:webpages) {
             ISet<URI> links = new ChainedHashSet<URI>();
-            for (URI link:page.getLinks()) {  // process all this page's links
+            for (URI link:page.getLinks()) {  // process all this page's out-links
                 if (allLinks.contains(link)) {  // external links are omitted
                     if (!page.getUri().equals(link)) {  // omit self-links
                         links.add(link);
@@ -156,7 +156,7 @@ public class PageRankAnalyzer {
      *               webpages given to the constructor.
      */
     public double computePageRank(URI pageUri) {
-        // Implementation note: this method should be very simple: just one line!
+        // Implementation note: this method should be very simple: just one line! po
         return pageRanks.get(pageUri);
     }
 }
